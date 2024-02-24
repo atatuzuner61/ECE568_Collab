@@ -1,0 +1,27 @@
+#Ata Tuzuner, 1006130633, ata.tuzuner@mail.utoronto.ca
+#Victoria Del Campo, 1006339366, victoria.delcampo@mail.utoronto.ca
+
+----------------------------------------------------------------------------------
+Part 1.1: generateQRcode
+
+In this part, we used the provided urlencode functions to encode the issuer and account information. We then translated the secret password that was provided to us in ASCII characters representing hex numbers. For this part, we used a mapping that converted ASCII representation of hex numbers to binary. We mapped each character individually, and then combined the binary representation of two characters to obtain a base 32 value.
+
+----------------------------------------------------------------------------------
+Part 1.2: validateQRcode
+
+In this part, we needed to validate a one-time password provided by the user. This meant recreating the HMAC One-Time Password and comparing it with the provided value. To do this, we used the provided documentation. RFC4226 provided us with the overall OTP function static public String generateOTP (this includes the moving factor or the use of the current time in the hash). We did not use the for loop for the moving factor, but instead shifted each digit in time by a specific amount. RFC4226 also provided us with an example of HOTP Computation for Digit = 6. Now, for the HMAC-SHA-1 calculation, we referred to RFC2104 for the inner and outer padding explanation of HMAC, and we used the SHA-1 transform as the base for HMAC transformation.
+
+HMAC-SHA-1 = HSHA(K XOR opad, SHA(K XOR ipad, text)) ~ MD5(K XOR opad, MD5(K XOR ipad, text))
+
+We used the SHA-1 functions provided to us as described in the lab guidelines.
+
+----------------------------------------------------------------------------------
+Part 2: mobile_mfa
+
+For this part, we completed the three functions below in order to properly communicate with the authentication app server and verify that credentials were enabled for the user. For each of these functions, we supplied the same headers as the other fucntions such as createUser to the requests. We followed a similar pipeline to send and process the requests.
+
+getAuthenticatorStatus: This function connects to the cloud service to check whether the user has successfully activated their mobile phone.
+
+getStepupStatus: This function connects to the cloud service and pushes an authentication request (a “stepUp”) to the mobile phone.
+
+sendStepup: This function connects to the cloud and checks if the user has successfully responded to the verification request and authenticated themselves on their mobile phone.

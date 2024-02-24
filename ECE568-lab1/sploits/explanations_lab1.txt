@@ -1,0 +1,30 @@
+#Ata Tuzuner, 1006130633, ata.tuzuner@mail.utoronto.ca
+#Victoria Del Campo, 1006339366, victoria.delcampo@mail.utoronto.ca
+
+
+----------------------------------------------------------------------------------
+sploit1 is a buffer overflow vulnerability.
+buf is placed in lab_main and the address of buf is at a lower address than lab_main's return address. The idea is to overwrite the return address of lab_main by overflowing buf. There is no limit to how much can be copied into buf, therefore the only check is to make sure the attack string doesn't contain a null terminator before it needs to end.
+
+----------------------------------------------------------------------------------
+sploit2 is a buffer overflow vulnerability.
+Unlike target1, the buf is now placed in foo. The idea now is to overwrite the return address of foo. There is also a limit on how many we can copy. However, this limit is defined by a local variable. This local variable is also placed at a higher address than buf. Therefore, we overwrite it (i.e. len) to increase the capacity of copying. We also make use of env variables since overwriting the len variable introduces null terminators to the attack string.
+
+----------------------------------------------------------------------------------
+sploit3 is a buffer overflow vulnerability.
+Here, buf is placed in foo and copying is done within another function bar. Since buf is in foo, the idea is still to overwrite the return address of foo. The copying limit is not applicable to our overflow as we need less characters for the attack string.
+
+----------------------------------------------------------------------------------
+sploit4 is a buffer overflow vulnerability.
+buf is in foo, therefore we overwrite the return address of foo. There is a copy length limit. To get around this, we overwrite i to decrease it by a fixed amount instead of increasing len. This works as the later loop doesn't use i to index into the attack string. We also make use of env variables as decreasing i introduces null terminators to the attack string.
+
+----------------------------------------------------------------------------------
+sploit5 is a format string vulnerability.
+Our format string overwrites the return address of the foo function. Shellcode is placed in the beginning of buf. Address of each byte of the new return address is placed in the beginning of the formatString consecutively (i.e. RA, RA+1, RA+2, RA+3), spaced apart by 4 dummy bytes. We move the argument pointer of the program to point to the start of the formatString buffer using a series of %08x within our format string. Once the argument pointer aligns with the start address of the buffer, we write to the location in this address (i.e. to the address of the old RA) using %n. We specifically use %hhn to write one byte at a time. Between each %hhn, we use %nnx to achieve the lower 8 bits that we want to write into the old RA addres.
+
+----------------------------------------------------------------------------------
+sploit6 is a double free vulnerability.
+tmalloc and tfree organizes chunks using tags that are allocated as 8 bytes in the beginning of the respective chunks. Inserting a fake tag before the location of the second free operation allows us to manipulate the return address. The right pointer of this fake tag points to the address of the RA and the left pointer points to another fake tag. This second fake tag's free bit is set to one and the left pointer of this fake tag is set to the bytecode of the jmp assembly instruction to skip to our shellcode. As a result, the second free overwrites the old RA with the address of our second fake tag, which executes our shellcode.
+
+
+All sploits are completed and tested, to produce a terminal shell, on ECF servers remotely.
